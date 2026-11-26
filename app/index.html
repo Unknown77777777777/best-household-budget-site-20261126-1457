@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Duit Kita — Dasbor</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#/dasbor">
+      <svg class="piggy" width="34" height="26" viewBox="0 0 34 26" aria-hidden="true">
+        <ellipse cx="17" cy="15" rx="14" ry="9" fill="#e9a13b"/>
+        <circle cx="28" cy="11" r="5" fill="#e9a13b"/>
+        <circle cx="29.5" cy="10" r="1" fill="#1d5c3f"/>
+        <rect x="24" y="7" width="4" height="2.5" rx="1" fill="#c4553b"/>
+        <rect x="8" y="22" width="3" height="4" fill="#e9a13b"/>
+        <rect x="22" y="22" width="3" height="4" fill="#e9a13b"/>
+        <path d="M3 13 L1 10 L4 11 Z" fill="#e9a13b"/>
+      </svg>
+      Duit Kita
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Buka menu" aria-expanded="false">☰</button>
+    <nav class="main-nav" id="mainNav" aria-label="Navigasi utama">
+      <a href="#/dasbor" data-route="dasbor">Dasbor</a>
+      <a href="#/pemasukan" data-route="pemasukan">Pemasukan</a>
+      <a href="#/pengeluaran" data-route="pengeluaran">Pengeluaran</a>
+      <a href="#/anggaran" data-route="anggaran">Anggaran</a>
+      <a href="#/tabungan" data-route="tabungan">Tabungan</a>
+      <a href="#/laporan" data-route="laporan">Laporan</a>
+    </nav>
+    <button class="btn-reset" id="resetBtn" type="button">Reset ke data contoh</button>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+</header>
+
+<main>
+  <!-- ============ DASBOR ============ -->
+  <section class="page" id="page-dasbor">
+    <h1>Dasbor — November 2026</h1>
+    <p class="subtitle">Uang keluarga Bima &amp; Sari, Bandung. Uang keluarga, rapi dan tenang.</p>
+    <div class="grid-cards" id="summaryCards"></div>
+
+    <div class="grid-2" style="margin-top:16px">
+      <div class="card">
+        <h2 style="margin-top:0">Pengeluaran per kategori</h2>
+        <div class="chart-wrap"><canvas id="donutChart" width="160" height="160"></canvas></div>
+        <ul class="legend" id="donutLegend"></ul>
+      </div>
+      <div class="card">
+        <h2 style="margin-top:0">Dana darurat</h2>
+        <p id="emergencyText" style="margin:4px 0 8px"></p>
+        <div class="progress"><span id="emergencyBar" style="width:41%"></span></div>
+        <p class="note" id="emergencyNote"></p>
+        <h2>Transaksi terakhir</h2>
+        <ul class="legend" id="recentList"></ul>
+        <p><a href="#/pengeluaran">Lihat semua →</a></p>
+      </div>
+    </div>
+    <div class="tip" id="dashboardTip"></div>
+  </section>
+
+  <!-- ============ PEMASUKAN ============ -->
+  <section class="page" id="page-pemasukan">
+    <h1>Pemasukan — November 2026</h1>
+    <p class="subtitle">Semua uang yang masuk ke keluarga bulan ini.</p>
+    <table>
+      <thead><tr><th>Sumber</th><th>Tanggal terima</th><th class="num">Jumlah</th></tr></thead>
+      <tbody id="incomeRows"></tbody>
+      <tfoot><tr class="total"><td colspan="2">Total pemasukan</td><td class="num" id="incomeTotal"></td></tr></tfoot>
+    </table>
+    <form class="card" id="incomeForm">
+      <h2 style="margin-top:0">Tambah pemasukan</h2>
+      <div class="form-row">
+        <div class="field"><label for="inName">Nama sumber</label><input id="inName" type="text" placeholder="mis. Gaji Bima"></div>
+        <div class="field"><label for="inAmount">Jumlah (Rp)</label><input id="inAmount" type="number" min="1" step="1" placeholder="500000"></div>
+        <div class="field"><label for="inDate">Tanggal terima</label><input id="inDate" type="date" value="2026-11-26"></div>
+        <button class="btn" type="submit">Simpan</button>
+      </div>
+      <p class="error" id="incomeError"></p>
+    </form>
+  </section>
+
+  <!-- ============ PENGELUARAN ============ -->
+  <section class="page" id="page-pengeluaran">
+    <h1>Pengeluaran — November 2026</h1>
+    <p class="subtitle">Setiap rupiah yang keluar, tercatat rapi.</p>
+    <div class="filter-row">
+      <label for="catFilter">Kategori</label>
+      <select id="catFilter"></select>
+      <span id="expenseTotalLine" style="margin-left:auto;font-weight:700"></span>
+    </div>
+    <table>
+      <thead><tr><th>Tanggal</th><th>Deskripsi</th><th>Kategori</th><th class="num">Jumlah</th><th></th></tr></thead>
+      <tbody id="expenseRows"></tbody>
+      <tfoot><tr class="total"><td colspan="3">Total pengeluaran</td><td class="num" id="expenseTotal"></td><td></td></tr></tfoot>
+    </table>
+    <form class="card" id="expenseForm">
+      <h2 style="margin-top:0">Tambah transaksi</h2>
+      <div class="form-row">
+        <div class="field"><label for="exDate">Tanggal</label><input id="exDate" type="date" value="2026-11-26"></div>
+        <div class="field"><label for="exDesc">Deskripsi</label><input id="exDesc" type="text" placeholder="mis. Belanja mingguan pasar"></div>
+        <div class="field"><label for="exCat">Kategori</label><select id="exCat"></select></div>
+        <div class="field"><label for="exAmount">Jumlah (Rp)</label><input id="exAmount" type="number" min="1" step="1" placeholder="100000"></div>
+        <button class="btn" type="submit">Simpan</button>
+      </div>
+      <p class="error" id="expenseError"></p>
+    </form>
+  </section>
+
+  <!-- ============ ANGGARAN ============ -->
+  <section class="page" id="page-anggaran">
+    <h1>Anggaran — November 2026</h1>
+    <p class="subtitle">Geser slider untuk mengubah batas tiap kategori. Realisasi ikut dihitung dari transaksi.</p>
+    <div id="budgetList"></div>
+    <div class="summary-line" id="budgetSummary"></div>
+  </section>
+
+  <!-- ============ TABUNGAN ============ -->
+  <section class="page" id="page-tabungan">
+    <h1>Tabungan</h1>
+    <p class="subtitle">Tiga tujuan keluarga: dana darurat, liburan, dan pendidikan anak.</p>
+    <div class="grid-3" id="savingCards"></div>
+    <form class="card" id="savingForm">
+      <h2 style="margin-top:0">Tambah tabungan</h2>
+      <div class="form-row">
+        <div class="field"><label for="svGoal">Tujuan</label><select id="svGoal"></select></div>
+        <div class="field"><label for="svAmount">Jumlah (Rp)</label><input id="svAmount" type="number" min="1" step="1" placeholder="100000"></div>
+        <button class="btn" type="submit">Simpan</button>
+      </div>
+      <p class="error" id="savingError"></p>
+    </form>
+    <div class="summary-line" id="savingSummary"></div>
+  </section>
+
+  <!-- ============ LAPORAN ============ -->
+  <section class="page" id="page-laporan">
+    <h1>Laporan — November 2026</h1>
+    <p class="subtitle">Ringkasan bulan keluarga Bima &amp; Sari.</p>
+    <div class="card">
+      <h2 style="margin-top:0">Realisasi vs batas anggaran</h2>
+      <div class="chart-wrap"><canvas id="barChart" width="680" height="320"></canvas></div>
+    </div>
+    <div class="grid-cards" id="reportCards" style="margin-top:16px"></div>
+    <h2>Tabel ringkasan per kategori</h2>
+    <table>
+      <thead><tr><th>Kategori</th><th class="num">Batas</th><th class="num">Realisasi</th><th class="num">Selisih</th><th class="num">Terpakai</th></tr></thead>
+      <tbody id="reportRows"></tbody>
+    </table>
+    <div class="tip" id="reportClosing"></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  Data tersimpan di peramban ini saja dan bisa direset kapan pun dengan tombol "Reset ke data contoh".
+</footer>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
